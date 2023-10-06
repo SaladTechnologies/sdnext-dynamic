@@ -1,0 +1,12 @@
+version: '3'
+services:
+  sdnext:
+    image: saladtechnologies/sdnext:dynamic
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 7860:7860
+    environment:
+      CIVITAI_MODEL_VERSION_IDS: 131579
+      LOAD_REFINER: 1
