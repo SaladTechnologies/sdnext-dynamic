@@ -9,6 +9,8 @@ saladtechnologies/sdnext:dynamic
 ## Environment Variables
 | Variable | Description | Default |
 | -------- | ----------- | ------- |
+| HOST | The host to listen on | 0.0.0.0 |
+| PORT | The port to listen on | 7860 |
 | CIVITAI_MODEL_VERSION_IDS | A comma-separated list of model version IDs to download. | None |
 | LOAD_REFINER | If set to `1`, the SDXL refiner model will be downloaded. | 0 |
 | CLI_ARGS | Additional arguments to pass to the `sdnext` launch command. Options can be found with `--help` | None |
