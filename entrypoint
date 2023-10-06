@@ -16,6 +16,17 @@ fi
 sd_model_path=$DATA_DIR/models/Stable-diffusion/
 mkdir -p $sd_model_path
 
+launch_args="--data-dir=\"$DATA_DIR\" \
+--port $PORT \
+--server-name \"$HOST\" \
+--no-download \
+--quick \
+--use-cuda"
+
+backend="original"
+
+# Download a model from Civit.ai
+# Usage: download_civitai_model <model_version_id>
 function download_civitai_model() {
     model_version_id=$1
     echo "Checking Civit.ai model $model_version_id"
@@ -26,6 +37,12 @@ function download_civitai_model() {
     fi
 
     base_model=$(echo $model_info | jq -r '.baseModel')
+
+    # if base_model contains SDXL, we need to set the backend to diffusers
+    if [[ $base_model == *"SDXL"* ]]; then
+      backend="diffusers"
+    fi
+
     file_obj=$(echo $model_info | jq -r '.files[0]')
     filename=$(echo $file_obj | jq -r '.name')
     download_url=$(echo $file_obj | jq -r '.downloadUrl')
@@ -43,6 +60,20 @@ function download_civitai_model() {
 }
 
 
+# Download a file from Huggingface
+# Usage: download_hf_file <repo_id> <filename>
+function download_hf_file() {
+  repo_id=$1
+  filename=$2
+  dest_file=$sd_model_path$filename
+  download_url="https://huggingface.co/$repo_id/resolve/main/$filename"
+  echo "Downloading $filename from $download_url"
+  time_output=$(time (wget -q $download_url -O $dest_file 2>&1) 2>&1)
+  real_time=$(echo $time_output | grep real | awk '{print $2}')
+  echo "Downloaded $filename as $dest_file in $real_time"
+}
+
+
 if [ -n "$CIVITAI_MODEL_VERSION_IDS" ]; then
     IFS=',' read -ra VERSION_IDS <<< "$CIVITAI_MODEL_VERSION_IDS"
     for version_id in "${VERSION_IDS[@]}"; do
@@ -52,16 +83,10 @@ fi
 
 if [ -n "$LOAD_REFINER" ]; then
     if [ "$LOAD_REFINER" == "1" ]; then
-        REFINER_REPO=${REFINER_REPO:-"https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0"}
+        refiner_repo="stabilityai/stable-diffusion-xl-refiner-1.0"
         refiner_version="sd_xl_refiner_1.0.safetensors"
-        dest_file=$sd_model_path$refiner_version
-        download_url=$REFINER_REPO/resolve/main/$refiner_version
-
-        echo "Downloading $refiner_version from $REFINER_REPO"
-        time_output=$(time (wget -q $download_url -O $dest_file 2>&1) 2>&1)
-        real_time=$(echo $time_output | grep real | awk '{print $2}')
-        echo "Downloaded $refiner_version as $dest_file in $real_time"
-        echo "Once downloaded, you can use the following command to load the refiner:"
+        download_hf_file $refiner_repo $refiner_version
+        echo "Once the server is up, you can use the following command to load the refiner:"
         echo "curl -X 'POST' \\
           'http://$HOST:$PORT/sdapi/v1/options' \\
           -H 'accept: application/json' \\
@@ -82,10 +107,8 @@ chown -R $RUN_UID:$RUN_UID /tmp/gradio
 
 exec runuser -u $(id -un $RUN_UID) -g $(id -gn) -- \
 python "$INSTALLDIR"/launch.py \
---data-dir="$DATA_DIR" \
+$launch_args \
+--backend $backend \
 --ckpt $ckpt \
---port $PORT \
---server-name "$HOST" \
---no-download \
---quick \
+$CLI_ARG \
 "$@"
