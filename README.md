@@ -82,3 +82,44 @@ You'll get a JSON response that includes a `.modelVersions` field:
 ```
 
 Find the model version you want to use and copy the `id` field.
+
+
+## Deploying on Salad (Portal)
+
+As an example, we're going to deploy the Dreamshaper XL model
+
+### Create a Deployment
+
+![](images/setup1.png)
+
+1. Name your deployment
+2. Select the `saladtechnologies/sdnext:dynamic` image
+3. Select how many vCPUs you need. For this we'll use 2
+4. Select how much RAM you need. Since we plan on using the refiner model, we'll use 30GB
+
+![](images/setup2.png)
+
+5. Select your GPUs. For and SDXL based model, we'll want GPUs with at least 16GB of VRAM.
+
+![](images/setup3.png)
+
+6. Click "edit" on the Networking section, and enable networking for port 7860 (the default port for SDNext).
+
+![](images/setup4.png)
+
+7. Click "edit" on the Environment Variables section, and add the following variables:
+    - `HOST` with a value of `[::]`
+    - `CIVITAI_MODEL_VERSION_IDS` with a value of `126688`
+    - `LOAD_REFINER` with a value of `1`
+
+![](images/setup5.png)
+
+8. Click "Deploy" to finish creating your deployment. Then, click "Start" to start it.
+
+### Your Finished Deployment
+
+![](images/deployment-info.png)
+
+With the environment configured like this:
+
+![](images/deployed-env.png)
