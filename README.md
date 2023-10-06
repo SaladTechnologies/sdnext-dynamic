@@ -26,6 +26,18 @@ saladtechnologies/sdnext:dynamic
 3. Copy the version ID from the URL
 ![](images/image3.png)
 
+**OR**
+
+2. Copy the link from the download button
+![](images/image5.png)
+
+3. Paste the link into a text editor and copy the model version ID from the URL
+```
+https://civitai.com/api/download/models/128713
+```
+
+For this url, the model version id is `128713`.
+
 ## Finding Your Model Version ID (API)
 
 1. Navigate to the Civit.ai page for the model you want to use
