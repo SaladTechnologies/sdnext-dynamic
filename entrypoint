@@ -16,15 +16,6 @@ fi
 sd_model_path=$DATA_DIR/models/Stable-diffusion/
 mkdir -p $sd_model_path
 
-launch_args="--data-dir=\"$DATA_DIR\" \
---port $PORT \
---server-name \"$HOST\" \
---no-download \
---quick \
---use-cuda \
---docs \
---api-only"
-
 backend="original"
 
 # Download a model from Civit.ai
@@ -109,7 +100,13 @@ chown -R $RUN_UID:$RUN_UID /tmp/gradio
 
 exec runuser -u $(id -un $RUN_UID) -- \
 python "$INSTALLDIR"/launch.py \
-$launch_args \
+--data-dir="$DATA_DIR" \
+--port $PORT \
+--server-name "$HOST" \
+--no-download \
+--quick \
+--use-cuda \
+--docs \
 --backend $backend \
 --ckpt $ckpt \
 $CLI_ARGS \
