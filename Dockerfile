@@ -10,3 +10,5 @@ ENV HOST='0.0.0.0'
 ENV PORT=7860
 
 ENTRYPOINT ["./entrypoint"]
+
+CMD []

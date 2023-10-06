@@ -21,7 +21,9 @@ launch_args="--data-dir=\"$DATA_DIR\" \
 --server-name \"$HOST\" \
 --no-download \
 --quick \
---use-cuda"
+--use-cuda \
+--docs \
+--api-only"
 
 backend="original"
 
@@ -38,10 +40,6 @@ function download_civitai_model() {
 
     base_model=$(echo $model_info | jq -r '.baseModel')
 
-    # if base_model contains SDXL, we need to set the backend to diffusers
-    if [[ $base_model == *"SDXL"* ]]; then
-      backend="diffusers"
-    fi
 
     file_obj=$(echo $model_info | jq -r '.files[0]')
     filename=$(echo $file_obj | jq -r '.name')
@@ -52,6 +50,10 @@ function download_civitai_model() {
     echo "Downloading $model_name ($model_type) as $filename from $download_url"
     if [ "$model_type" == "Checkpoint" ]; then
       dest_file=$sd_model_path$filename
+    fi
+    # if base_model contains SDXL, we need to set the backend to diffusers
+    if [[ $base_model == *"SDXL"* ]]; then
+      backend="diffusers"
     fi
     time_output=$(time (wget -q $download_url --content-disposition -O $dest_file 2>&1) 2>&1)
     real_time=$(echo $time_output | grep real | awk '{print $2}')
@@ -105,10 +107,10 @@ chown -R $RUN_UID:$RUN_UID $DATA_DIR
 mkdir -p /tmp/gradio
 chown -R $RUN_UID:$RUN_UID /tmp/gradio
 
-exec runuser -u $(id -un $RUN_UID) -g $(id -gn) -- \
+exec runuser -u $(id -un $RUN_UID) -- \
 python "$INSTALLDIR"/launch.py \
 $launch_args \
 --backend $backend \
 --ckpt $ckpt \
-$CLI_ARG \
+$CLI_ARGS \
 "$@"
