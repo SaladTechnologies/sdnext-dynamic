@@ -100,7 +100,7 @@ As an example, we're going to deploy the Dreamshaper XL model
 
 ![](images/setup2.png)
 
-5. Select your GPUs. For and SDXL based model, we'll want GPUs with at least 16GB of VRAM.
+5. Select your GPUs. For an SDXL based model, we'll want GPUs with at least 16GB of VRAM.
 
 ![](images/setup3.png)
 
