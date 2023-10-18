@@ -14,44 +14,44 @@ if [ -z $DATA_DIR ]; then
 fi
 
 sd_model_path=$DATA_DIR/models/Stable-diffusion/
+extension_path=$DATA_DIR/extensions/
 mkdir -p $sd_model_path
+mkdir -p $extension_path
 
 backend="original"
 
 # Download a model from Civit.ai
 # Usage: download_civitai_model <model_version_id>
 function download_civitai_model() {
-    model_version_id=$1
-    echo "Checking Civit.ai model $model_version_id"
-    model_info=$(curl -sSf https://civitai.com/api/v1/model-versions/$model_version_id)
-    if [ $? -ne 0 ]; then
-      echo "Error: Failed to fetch model info."
-      exit 1
-    fi
+  model_version_id=$1
+  echo "Checking Civit.ai model $model_version_id"
+  model_info=$(curl -sSf https://civitai.com/api/v1/model-versions/$model_version_id)
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to fetch model info."
+    exit 1
+  fi
 
-    base_model=$(echo $model_info | jq -r '.baseModel')
+  base_model=$(echo $model_info | jq -r '.baseModel')
 
+  file_obj=$(echo $model_info | jq -r '.files[0]')
+  filename=$(echo $file_obj | jq -r '.name')
+  download_url=$(echo $file_obj | jq -r '.downloadUrl')
+  model_name=$(echo $model_info | jq -r '.model.name')
+  model_type=$(echo $model_info | jq -r '.model.type')
 
-    file_obj=$(echo $model_info | jq -r '.files[0]')
-    filename=$(echo $file_obj | jq -r '.name')
-    download_url=$(echo $file_obj | jq -r '.downloadUrl')
-    model_name=$(echo $model_info | jq -r '.model.name')
-    model_type=$(echo $model_info | jq -r '.model.type')
-
-    echo "Downloading $model_name ($model_type) as $filename from $download_url"
-    if [ "$model_type" == "Checkpoint" ]; then
-      dest_file=$sd_model_path$filename
-    fi
-    # if base_model contains SDXL, we need to set the backend to diffusers
-    if [[ $base_model == *"SDXL"* ]]; then
-      backend="diffusers"
-    fi
-    time_output=$(time (wget -q $download_url --content-disposition -O $dest_file 2>&1) 2>&1)
-    real_time=$(echo $time_output | grep real | awk '{print $2}')
-    echo "Downloaded $model_name ($model_type) as $dest_file in $real_time"
-    ckpt=$dest_file
+  echo "Downloading $model_name ($model_type) as $filename from $download_url"
+  if [ "$model_type" == "Checkpoint" ]; then
+    dest_file=$sd_model_path$filename
+  fi
+  # if base_model contains SDXL, we need to set the backend to diffusers
+  if [[ $base_model == *"SDXL"* ]]; then
+    backend="diffusers"
+  fi
+  time_output=$(time (wget -q $download_url --content-disposition -O $dest_file 2>&1) 2>&1)
+  real_time=$(echo $time_output | grep real | awk '{print $2}')
+  echo "Downloaded $model_name ($model_type) as $dest_file in $real_time"
+  ckpt=$dest_file
 }
-
 
 # Download a file from Huggingface
 # Usage: download_hf_file <repo_id> <filename>
@@ -66,31 +66,40 @@ function download_hf_file() {
   echo "Downloaded $filename as $dest_file in $real_time"
 }
 
-
 if [ -n "$CIVITAI_MODEL_VERSION_IDS" ]; then
-    IFS=',' read -ra VERSION_IDS <<< "$CIVITAI_MODEL_VERSION_IDS"
-    for version_id in "${VERSION_IDS[@]}"; do
-        download_civitai_model $version_id
-    done
+  IFS=',' read -ra VERSION_IDS <<<"$CIVITAI_MODEL_VERSION_IDS"
+  for version_id in "${VERSION_IDS[@]}"; do
+    download_civitai_model $version_id
+  done
 fi
 
 if [ -n "$LOAD_REFINER" ]; then
-    if [ "$LOAD_REFINER" == "1" ]; then
-        refiner_repo="stabilityai/stable-diffusion-xl-refiner-1.0"
-        refiner_version="sd_xl_refiner_1.0.safetensors"
-        download_hf_file $refiner_repo $refiner_version
-        echo "Once the server is up, you can use the following command to load the refiner:"
-        echo "curl -X 'POST' \\
+  if [ "$LOAD_REFINER" == "1" ]; then
+    refiner_repo="stabilityai/stable-diffusion-xl-refiner-1.0"
+    refiner_version="sd_xl_refiner_1.0.safetensors"
+    download_hf_file $refiner_repo $refiner_version
+    echo "Once the server is up, you can use the following command to load the refiner:"
+    echo "curl -X 'POST' \\
           'http://$HOST:$PORT/sdapi/v1/options' \\
           -H 'accept: application/json' \\
           -H 'Content-Type: application/json' \\
           -d '{
           \"sd_model_refiner\": \"$refiner_version\"
         }'"
-    fi
+  fi
 fi
 
-
+if [ -n "$EXTENSIONS" ]; then
+  IFS=',' read -ra EXTENSIONS <<<"$EXTENSIONS"
+  for extension in "${EXTENSIONS[@]}"; do
+    # these are in the format of name|repo_url
+    IFS='|' read -ra EXTENSION <<<"$extension"
+    extension_name=${EXTENSION[0]}
+    extension_repo=${EXTENSION[1]}
+    git clone $extension_repo $extension_path$extension_name
+    echo "Installed extension $extension_name from $extension_repo"
+  done
+fi
 
 # Ensure that potentially bind-mounted directories are owned by the user that runs the service
 chown -R $RUN_UID:$RUN_UID $DATA_DIR
@@ -99,15 +108,15 @@ mkdir -p /tmp/gradio
 chown -R $RUN_UID:$RUN_UID /tmp/gradio
 
 exec runuser -u $(id -un $RUN_UID) -- \
-python "$INSTALLDIR"/launch.py \
---data-dir="$DATA_DIR" \
---port $PORT \
---server-name "$HOST" \
---no-download \
---quick \
---use-cuda \
---docs \
---backend $backend \
---ckpt $ckpt \
-$CLI_ARGS \
-"$@"
+  python "$INSTALLDIR"/launch.py \
+  --data-dir="$DATA_DIR" \
+  --port $PORT \
+  --server-name "$HOST" \
+  --no-download \
+  --quick \
+  --use-cuda \
+  --docs \
+  --backend $backend \
+  --ckpt $ckpt \
+  $CLI_ARGS \
+  "$@"
