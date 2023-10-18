@@ -13,12 +13,25 @@ if [ -z $DATA_DIR ]; then
   exit 1
 fi
 
+base_path=$(dirname "$DATADIR")
+
 sd_model_path=$DATA_DIR/models/Stable-diffusion/
+vae_path=$DATA_DIR/models/VAE/
 extension_path=$DATA_DIR/extensions/
+controlnet_model_path=$base_path/extensions-builtin/sd-webui-controlnet/models/
 mkdir -p $sd_model_path
 mkdir -p $extension_path
 
 backend="original"
+
+function getModelFile() {
+  json=$1
+
+  # json is an object with a key "files" which is an array of objects. We want to select the object where .type = Model
+  files=$(echo $json | jq -r '.files')
+  model_file=$(echo $files | jq -r '.[] | select(.type == "Model")')
+  echo $model_file
+}
 
 # Download a model from Civit.ai
 # Usage: download_civitai_model <model_version_id>
@@ -33,7 +46,7 @@ function download_civitai_model() {
 
   base_model=$(echo $model_info | jq -r '.baseModel')
 
-  file_obj=$(echo $model_info | jq -r '.files[0]')
+  file_obj=$(getModelFile "$model_info")
   filename=$(echo $file_obj | jq -r '.name')
   download_url=$(echo $file_obj | jq -r '.downloadUrl')
   model_name=$(echo $model_info | jq -r '.model.name')
@@ -42,7 +55,17 @@ function download_civitai_model() {
   echo "Downloading $model_name ($model_type) as $filename from $download_url"
   if [ "$model_type" == "Checkpoint" ]; then
     dest_file=$sd_model_path$filename
+    ckpt="--ckpt $dest_file"
+  elif [ "$model_type" == "Controlnet" ]; then
+    dest_file=$controlnet_model_path$filename
+  elif [ "$model_type" == "VAE" ]; then
+    dest_file=$vae_path$filename
+    vae="--vae $dest_file"
+  else
+    echo "Error: Unknown model type $model_type"
+    exit 1
   fi
+
   # if base_model contains SDXL, we need to set the backend to diffusers
   if [[ $base_model == *"SDXL"* ]]; then
     backend="diffusers"
@@ -50,7 +73,6 @@ function download_civitai_model() {
   time_output=$(time (wget -q $download_url --content-disposition -O $dest_file 2>&1) 2>&1)
   real_time=$(echo $time_output | grep real | awk '{print $2}')
   echo "Downloaded $model_name ($model_type) as $dest_file in $real_time"
-  ckpt=$dest_file
 }
 
 # Download a file from Huggingface
@@ -117,6 +139,7 @@ exec runuser -u $(id -un $RUN_UID) -- \
   --use-cuda \
   --docs \
   --backend $backend \
-  --ckpt $ckpt \
+  $ckpt \
+  $vae \
   $CLI_ARGS \
   "$@"
