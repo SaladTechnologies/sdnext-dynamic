@@ -1,7 +1,7 @@
 # sdnext-dynamic
 This wraps our SDNext image with an entrypoint script that downloads a checkpoint based on an environment variable.
 
-You can use the prebuild docker image as:
+You can use the prebuilt docker image at:
 ```
 saladtechnologies/sdnext:dynamic
 ```
