@@ -87,7 +87,7 @@ function download_civitai_model() {
 
   if [ -n "$config_file_obj" ]; then
     config_download_url=$(echo $config_file_obj | jq -r '.downloadUrl')
-    download_location=$(dirname "$dest_file")$config_filename
+    download_location=$(dirname "$dest_file")/$config_filename
     echo "Downloading config file $config_filename from $config_download_url"
     time_output=$(time (wget -q $config_download_url --content-disposition -O $download_location 2>&1) 2>&1)
     real_time=$(echo $time_output | grep real | awk '{print $2}')
