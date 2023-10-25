@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+CIVITAI_MODEL_VERSION_IDS="122143,128713"
+
+# the tag is the version ids with a hypen between them
+tag=$(echo $CIVITAI_MODEL_VERSION_IDS | tr ',' '-')
+base_tag="dynamic"
+
+docker buildx build \
+  -t saladtechnologies/sdnext:$tag \
+  -f Dockerfile.baked \
+  --platform linux/amd64 \
+  --output type=docker \
+  --provenance false \
+  --build-arg VERSION=$base_tag \
+  --build-arg CIVITAI_MODEL_VERSION_IDS=$CIVITAI_MODEL_VERSION_IDS \
+  .

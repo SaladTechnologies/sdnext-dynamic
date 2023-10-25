@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+docker buildx build \
+  -t saladtechnologies/sdnext:dynamic \
+  -f Dockerfile \
+  --platform linux/amd64 \
+  --output type=docker \
+  --provenance false \
+  .
