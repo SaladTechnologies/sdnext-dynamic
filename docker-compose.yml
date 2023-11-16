@@ -1,7 +1,7 @@
 version: '3'
 services:
   sdnext:
-    image: saladtechnologies/sdnext:sdxl1.0
+    image: saladtechnologies/sdnext:dynamic
     deploy:
       resources:
         reservations:
@@ -12,11 +12,15 @@ services:
     ports:
       - 7860:7860
     volumes:
-      - ./models:/data/models
-      # environment:
-      # A comma separated list of model version ids to load
-      # CIVITAI_MODEL_VERSION_IDS: 122143,128713
-
-      # Set to 1 to enable the refiner
+      - ./models:/webui/data/models
+    environment:
+      ### A comma separated list of model version ids to load
+      CIVITAI_MODEL_VERSION_IDS: 122143,128713
+      ### Set to 1 to enable the refiner
       # LOAD_REFINER: 0
+
+      ### Set to 1 to enable base sdxl
+      # LOAD_SDXL_BASE: 0
+
+      ### A comma separated list of extensions to load, each in the format of `name\|repoUrl`
       # EXTENSIONS: 'deforum|https://github.com/deforum-art/sd-webui-deforum'
