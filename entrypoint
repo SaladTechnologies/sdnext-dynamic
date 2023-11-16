@@ -130,6 +130,8 @@ if [ -n "$LOAD_SDXL_BASE" ]; then
     sd_xl_base_repo="stabilityai/stable-diffusion-xl-base-1.0"
     sd_xl_base_version="sd_xl_base_1.0.safetensors"
     download_hf_file $sd_xl_base_repo $sd_xl_base_version
+    backend="diffusers"
+    ckpt="--ckpt $sd_model_path$sd_xl_base_version"
   fi
 fi
 
