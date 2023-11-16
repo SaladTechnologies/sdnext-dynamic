@@ -1,10 +1,14 @@
 # sdnext-dynamic
-This wraps our SDNext image with an entrypoint script that downloads a checkpoint based on an environment variable.
+This wraps our SDNext image with an entrypoint script that downloads a checkpoint at runtime based on an environment variable.
 
 You can use the prebuilt docker image at:
 ```
 saladtechnologies/sdnext:dynamic
 ```
+### "Baked" Images
+If you want an image with the model preloaded, you can use one of the "baked" images. These are built with the `build-baked` script, and will not need to download the models at runtime.
+
+- `saladtechnologies/sdnext:sdxl1.0`
 
 ## Build your own image
 
