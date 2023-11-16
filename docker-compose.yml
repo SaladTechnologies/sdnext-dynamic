@@ -2,9 +2,6 @@ version: '3'
 services:
   sdnext:
     image: saladtechnologies/sdnext:dynamic
-    build:
-      context: .
-      dockerfile: Dockerfile
     deploy:
       resources:
         reservations:
@@ -22,5 +19,4 @@ services:
 
       # Set to 1 to enable the refiner
       LOAD_REFINER: 0
-
-      EXTENSIONS: 'deforum|https://github.com/deforum-art/sd-webui-deforum'
+      # EXTENSIONS: 'deforum|https://github.com/deforum-art/sd-webui-deforum'

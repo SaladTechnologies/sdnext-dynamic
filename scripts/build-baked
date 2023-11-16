@@ -1,9 +1,53 @@
 #! /usr/bin/env bash
 
-CIVITAI_MODEL_VERSION_IDS="122143,128713"
+## Usage: ./build [--push] [--civitai-version-ids 122143,128713] [--load-refiner] [--load-sdxl-base] [--tag tag]
 
-# the tag is the version ids with a hypen between them
-tag=$(echo $CIVITAI_MODEL_VERSION_IDS | tr ',' '-')
+set -euo pipefail
+
+# parse args
+push=false
+load_refiner=0
+load_sdxl_base=0
+civitai_model_version_ids=""
+tag=""
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+  --push)
+    push=true
+    shift
+    ;;
+  --load-refiner)
+    load_refiner=1
+    shift
+    ;;
+  --load-sdxl-base)
+    load_sdxl_base=1
+    shift
+    ;;
+  --civitai-version-ids)
+    civitai_model_version_ids="$2"
+    shift
+    shift
+    ;;
+  --tag)
+    tag="$2"
+    shift
+    shift
+    ;;
+  *)
+    echo "Unknown option $key"
+    exit 1
+    ;;
+  esac
+done
+
+git_sha=$(git rev-parse --short HEAD)
+
+# the default tag is the version ids with a hypen between them
+if [[ -z $tag ]]; then
+  tag=$(echo $civitai_model_version_ids | tr ',' '-')
+fi
 base_tag="dynamic"
 
 docker buildx build \
@@ -13,5 +57,17 @@ docker buildx build \
   --output type=docker \
   --provenance false \
   --build-arg VERSION=$base_tag \
-  --build-arg CIVITAI_MODEL_VERSION_IDS=$CIVITAI_MODEL_VERSION_IDS \
+  --build-arg CIVITAI_MODEL_VERSION_IDS=$civitai_model_version_ids \
+  --build-arg LOAD_REFINER=$load_refiner \
+  --build-arg LOAD_SDXL_BASE=$load_sdxl_base \
   .
+
+docker tag saladtechnologies/sdnext:$tag saladtechnologies/sdnext:$tag-$git_sha
+
+if [[ $push == true ]]; then
+  echo "Pushing saladtechnologies/sdnext:$tag"
+  docker push saladtechnologies/sdnext:$tag
+
+  echo "Pushing saladtechnologies/sdnext:$tag-$git_sha"
+  docker push saladtechnologies/sdnext:$tag-$git_sha
+fi

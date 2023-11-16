@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+## Usage: ./build [--push]
+
+set -euo pipefail
+
+push=${1:-""}
+
+./scripts/build-baked --load-refiner --load-sdxl-base --tag sdxl1.0 $push

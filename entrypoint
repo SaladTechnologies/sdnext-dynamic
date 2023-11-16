@@ -125,6 +125,14 @@ if [ -n "$CIVITAI_MODEL_VERSION_IDS" ]; then
   done
 fi
 
+if [ -n "$LOAD_SDXL_BASE" ]; then
+  if [ "$LOAD_SDXL_BASE" == "1" ]; then
+    sd_xl_base_repo="stabilityai/stable-diffusion-xl-base-1.0"
+    sd_xl_base_version="sd_xl_base_1.0.safetensors"
+    download_hf_file $sd_xl_base_repo $sd_xl_base_version
+  fi
+fi
+
 if [ -n "$LOAD_REFINER" ]; then
   if [ "$LOAD_REFINER" == "1" ]; then
     refiner_repo="stabilityai/stable-diffusion-xl-refiner-1.0"

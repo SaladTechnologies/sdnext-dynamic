@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+# post the contents of the json file to the sdapi
+
+curl -X POST \
+  'http://localhost:7860/sdapi/v1/txt2img' \
+  --header 'Content-Type: application/json' \
+  --data-binary "@qr-request.json" |
+  jq -r '.images[0]' | base64 -d >qr-code.png
