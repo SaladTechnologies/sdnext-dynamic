@@ -45,6 +45,37 @@ The "baked" images use this one as a base
 | CLI_ARGS | Additional arguments to pass to the `sdnext` launch command. Options can be found with `--help` | None |
 | EXTENSIONS | A comma separated list of extensions to load, each in the format of `name\|repoUrl`. e.g. `deforum\|https://github.com/deforum-art/sd-webui-deforum`  | None |
 
+## Built-in Exec Probes
+An exec probe is a command that is run periodically to check the health or readiness of the container. It returns a zero exit code if the container is healthy, and a non-zero exit code if the container is unhealthy. You can configure the maximum number of retries and the interval between retries using either the portal or the [Create Container Group API](https://docs.salad.com/reference/create_container_group). Learn more about health probes in [the docs](https://docs.salad.com/docs/health-probes).
+
+### Startup Probe
+
+This probe will return a zero exit code when the server is ready to accept connections. It will return a non-zero exit code if the server is not ready to accept connections.  Keep in mind it can take quite a while to download the models, so be sure to set a generous number of retries and a long interval, or your container will never start taking traffic, and will be continually reallocated.
+
+**Portal**
+```shell
+python readiness.py
+```
+
+**API**
+```json
+["python", "readiness.py"]
+```
+
+### Liveness Probe
+
+This probe will return a zero exit code when the server has not any memory problems. It will return a non-zero exit code if the server has run out of, or is about to run out of, memory.
+
+**Portal**
+```shell
+python healthcheck.py
+```
+
+**API**
+```json
+["python", "healthcheck.py"]
+```
+
 ## Finding Your Model Version ID (Website)
 
 1. Navigate to the Civit.ai page for the model you want to use
