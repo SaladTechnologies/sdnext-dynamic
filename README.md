@@ -8,7 +8,8 @@ saladtechnologies/sdnext:dynamic
 ### "Baked" Images
 If you want an image with the model preloaded, you can use one of the "baked" images. These are built with the `build-baked` script, and will not need to download the models at runtime.
 
-- `saladtechnologies/sdnext:sdxl1.0`
+- `saladtechnologies/sdnext:sdxl1.0` - Preloaded with SDXL [Base](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) and [Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
+- `saladtechnologies/sdnext:dreamshaper8` - Preloaded with [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713)
 
 ## Build your own image
 
