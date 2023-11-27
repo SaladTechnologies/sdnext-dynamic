@@ -1,7 +1,7 @@
 version: '3'
 services:
   sdnext:
-    image: saladtechnologies/sdnext:dynamic
+    image: saladtechnologies/sdnext:sdxl1.0
     deploy:
       resources:
         reservations:
@@ -11,11 +11,11 @@ services:
               count: all
     ports:
       - 7860:7860
-    volumes:
-      - ./models:/webui/data/models
-    environment:
+      # volumes:
+      #   - ./models:/webui/data/models
+      # environment:
       ### A comma separated list of model version ids to load
-      CIVITAI_MODEL_VERSION_IDS: 122143,128713
+      # CIVITAI_MODEL_VERSION_IDS: 122143,128713
       ### Set to 1 to enable the refiner
       # LOAD_REFINER: 0
 
