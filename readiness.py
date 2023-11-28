@@ -2,9 +2,12 @@ import requests
 import sys
 import os
 
-image_gen_url = "http://127.0.0.1:7860"
-ready_file = "/tmp/ready"
 load_refiner = os.environ.get("LOAD_REFINER", "0") == "1"
+host = "localhost"
+port = os.environ.get("PORT", "7860")
+
+image_gen_url = f"http://{host}:{port}"
+ready_file = "/tmp/ready"
 
 
 def get_sdnext_server_status():

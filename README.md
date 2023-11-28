@@ -39,7 +39,7 @@ The "baked" images use this one as a base
 ## Environment Variables
 | Variable | Description | Default |
 | -------- | ----------- | ------- |
-| HOST | The host to listen on. Use `[::]` on Salad. | 0.0.0.0 |
+| HOST | The host to listen on. Use `[::]` on Salad. You may need to use an ipv4 address like `0.0.0.0` for local development | `[::]` |
 | PORT | The port to listen on. This should match the port you configure for Salad networking. | 7860 |
 | CIVITAI_MODEL_VERSION_IDS | A comma-separated list of model version IDs to download. ex `128713` for just [Dreamshaper 8](https://civitai.com/models/4384?modelVersionId=128713) or `128713,166808` for Dreamshaper and [Arterior](https://civitai.com/models/112229/arterior-digital-art-style). This supports Checkpoints, VAEs, and Controlnets. The rightmost checkpoint value will be the default checkpoint when the server starts, and the rightmost vae value will be the default vae when the server starts. | None |
 | LOAD_SDXL_BASE | If set to `1`, the SDXL base model will be downloaded. | 0 |
@@ -56,26 +56,26 @@ This probe will return a zero exit code when the server is ready to accept conne
 
 **Portal**
 ```shell
-python readiness.py
+python /probes/readiness.py
 ```
 
 **API**
 ```json
-["python", "readiness.py"]
+["python", "/probes/readiness.py"]
 ```
 
 ### Liveness Probe
 
-This probe will return a zero exit code when the server has not any memory problems. It will return a non-zero exit code if the server has run out of, or is about to run out of, memory.
+This probe will return a zero exit code when the server has not encountered any memory problems. It will return a non-zero exit code if the server has run out of, or is about to run out of, memory.
 
 **Portal**
 ```shell
-python healthcheck.py
+python /probes/healthcheck.py
 ```
 
 **API**
 ```json
-["python", "healthcheck.py"]
+["python", "/probes/healthcheck.py"]
 ```
 
 ## Finding Your Model Version ID (Website)

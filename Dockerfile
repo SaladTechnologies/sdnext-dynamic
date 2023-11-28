@@ -5,9 +5,9 @@ RUN apt-get update && apt-get install -y \
   jq
 
 COPY entrypoint .
-COPY readiness.py .
+COPY readiness.py /probes/readiness.py
 
-ENV HOST='0.0.0.0'
+ENV HOST='[::]'
 ENV PORT=7860
 
 ENTRYPOINT ["./entrypoint"]
