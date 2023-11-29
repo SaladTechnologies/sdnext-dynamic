@@ -54,28 +54,65 @@ An exec probe is a command that is run periodically to check the health or readi
 
 This probe will return a zero exit code when the server is ready to accept connections. It will return a non-zero exit code if the server is not ready to accept connections.  Keep in mind it can take quite a while to download the models, so be sure to set a generous number of retries and a long interval, or your container will never start taking traffic, and will be continually reallocated.
 
+For example, SDXL takes quite a while to load the model, and one of the things the startup probe does is enable the refiner (if you've configured the container to do so). Enabling the refiner can take up to 3 minutes in rare circumstances, so the maximum timeout should be at least 180 seconds. The total time required to reach readiness could be quite long, so we want to make sure the failure threshold allows for enough time. In this case, I've set it to 600, which combined with the period, gives us 600 seconds (10 minutes) for the container to come up. For a container using an SD 1.5 model, you could get away with considerably shorter timeouts and failure thresholds. You will want to experiment with your specific model(s) to find the right values.
+
 **Portal**
-```shell
-python /probes/readiness.py
-```
+- **Protocol**: `exec`
+- **Command**: Command: `python` , Arg: `/probes/readiness.py`
+- **Initial Delay Seconds**: 20
+- **Period Seconds**: 1
+- **Timeout Seconds**: 200
+- **Success Threshold**: 1
+- **Failure Threshold**: 600
 
 **API**
 ```json
-["python", "/probes/readiness.py"]
+{
+  "exec": {
+    "command": [
+      "python",
+      "/probes/readiness.py"
+    ]
+  },
+  "initial_delay_seconds": 20,
+  "period_seconds": 1,
+  "timeout_seconds": 200,
+  "success_threshold": 1,
+  "failure_threshold": 600
+}
 ```
 
 ### Liveness Probe
 
 This probe will return a zero exit code when the server has not encountered any memory problems. It will return a non-zero exit code if the server has run out of, or is about to run out of, memory.
 
+Since this probe primarily checks for memory issues, it should be configured with a short timeout and a low failure threshold. If the container is running out of memory, it will likely not be able to recover, so we want to fail fast and let the container be reallocated.
+
 **Portal**
-```shell
-python /probes/healthcheck.py
-```
+- **Protocol**: `exec`
+- **Command**: Command: `python` , Arg: `/probes/healthcheck.py`
+- **Initial Delay Seconds**: 600
+- **Period Seconds**: 30
+- **Timeout Seconds**: 2
+- **Success Threshold**: 1
+- **Failure Threshold**: 3
+
 
 **API**
 ```json
-["python", "/probes/healthcheck.py"]
+ {
+  "exec": {
+    "command": [
+      "python",
+      "/probes/healthcheck.py"
+    ]
+  },
+  "initial_delay_seconds": 600,
+  "period_seconds": 30,
+  "timeout_seconds": 2,
+  "success_threshold": 1,
+  "failure_threshold": 3
+}
 ```
 
 ## Finding Your Model Version ID (Website)
