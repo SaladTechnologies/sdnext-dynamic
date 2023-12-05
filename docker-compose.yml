@@ -1,7 +1,7 @@
 version: '3'
 services:
   sdnext:
-    image: saladtechnologies/sdnext:sdxl1.0
+    image: saladtechnologies/sdnext:dynamic
     deploy:
       resources:
         reservations:
@@ -11,17 +11,19 @@ services:
               count: all
     ports:
       - 7860:7860
-      # volumes:
-      #   - ./models:/webui/data/models
+    volumes:
+      - ./data:/webui/data/
+      - ./controlnet-models:/webui/extensions-builtin/sd-webui-controlnet/models/
     environment:
       HOST: 0.0.0.0
-    ### A comma separated list of model version ids to load
-    # CIVITAI_MODEL_VERSION_IDS: 122143,128713
-    ### Set to 1 to enable the refiner
-    # LOAD_REFINER: 0
+      ### A comma separated list of model version ids to load
+      CIVITAI_MODEL_VERSION_IDS: 135867,126688
+      ### Set to 1 to enable the refiner
+      # LOAD_REFINER: 0
 
-    ### Set to 1 to enable base sdxl
-    # LOAD_SDXL_BASE: 0
+      ### Set to 1 to enable base sdxl
+      LOAD_SDXL_BASE: 1
 
+      CONTROLNET_URLS: https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/diffusers_xl_canny_mid.safetensors?download=true
     ### A comma separated list of extensions to load, each in the format of `name\|repoUrl`
     # EXTENSIONS: 'deforum|https://github.com/deforum-art/sd-webui-deforum'

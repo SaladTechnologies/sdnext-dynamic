@@ -21,8 +21,12 @@ sd_model_path=$DATA_DIR/models/Stable-diffusion/
 vae_path=$DATA_DIR/models/VAE/
 extension_path=$DATA_DIR/extensions/
 controlnet_model_path=$base_path/extensions-builtin/sd-webui-controlnet/models/
+lora_model_path=$DATA_DIR/models/Lora/
 mkdir -p $sd_model_path
+mkdir -p $vae_path
 mkdir -p $extension_path
+mkdir -p $controlnet_model_path
+mkdir -p $lora_model_path
 
 backend="original"
 
@@ -74,6 +78,8 @@ function download_civitai_model() {
   elif [ "$model_type" == "VAE" ]; then
     dest_file=$vae_path$model_filename
     vae="--vae $dest_file"
+  elif [ "$model_type" == "LORA" ]; then
+    dest_file=$lora_model_path$model_filename
   else
     echo "Error: Unknown model type $model_type"
     exit 1
@@ -102,8 +108,8 @@ function download_civitai_model() {
 }
 
 # Download a file from Huggingface
-# Usage: download_hf_file <repo_id> <model_filename>
-function download_hf_file() {
+# Usage: download_hf_checkpoint <repo_id> <model_filename>
+function download_hf_checkpoint() {
   repo_id=$1
   model_filename=$2
   dest_file=$sd_model_path$model_filename
@@ -118,6 +124,22 @@ function download_hf_file() {
   fi
 }
 
+function download_controlnet_from_url() {
+  file_dl_url=$1
+  filename=$(basename $file_dl_url)
+  #There might be query params in the url, so we need to remove them
+  filename=${filename%%\?*}
+  dest_file=$controlnet_model_path$filename
+  echo "Downloading controlnet: $filename from $file_dl_url"
+  if [ -f "$dest_file" ] && [ -s "$dest_file" ]; then
+    echo "File $dest_file already exists and is not empty. Skipping download."
+  else
+    time_output=$(time (wget -q $file_dl_url -O $dest_file 2>&1) 2>&1)
+    real_time=$(echo $time_output | grep real | awk '{print $2}')
+    echo "Downloaded $filename as $dest_file in $real_time"
+  fi
+}
+
 if [ -n "$CIVITAI_MODEL_VERSION_IDS" ]; then
   IFS=',' read -ra VERSION_IDS <<<"$CIVITAI_MODEL_VERSION_IDS"
   for version_id in "${VERSION_IDS[@]}"; do
@@ -125,11 +147,19 @@ if [ -n "$CIVITAI_MODEL_VERSION_IDS" ]; then
   done
 fi
 
+if [ -n "$CONTROLNET_URLS" ]; then
+  IFS=',' read -ra CONTROLNETS <<<"$CONTROLNET_URLS"
+  for controlnet in "${CONTROLNETS[@]}"; do
+    # These are urls to the controlnet files
+    download_controlnet_from_url $controlnet
+  done
+fi
+
 if [ -n "$LOAD_SDXL_BASE" ]; then
   if [ "$LOAD_SDXL_BASE" == "1" ]; then
     sd_xl_base_repo="stabilityai/stable-diffusion-xl-base-1.0"
     sd_xl_base_version="sd_xl_base_1.0.safetensors"
-    download_hf_file $sd_xl_base_repo $sd_xl_base_version
+    download_hf_checkpoint $sd_xl_base_repo $sd_xl_base_version
     backend="diffusers"
     ckpt="--ckpt $sd_model_path$sd_xl_base_version"
   fi
@@ -139,7 +169,7 @@ if [ -n "$LOAD_REFINER" ]; then
   if [ "$LOAD_REFINER" == "1" ]; then
     refiner_repo="stabilityai/stable-diffusion-xl-refiner-1.0"
     refiner_version="sd_xl_refiner_1.0.safetensors"
-    download_hf_file $refiner_repo $refiner_version
+    download_hf_checkpoint $refiner_repo $refiner_version
     echo "Once the server is up, you can use the following command to load the refiner:"
     echo "curl -X 'POST' \\
           'http://$HOST:$PORT/sdapi/v1/options' \\
@@ -189,6 +219,7 @@ exec runuser -u $(id -un $RUN_UID) -- \
   --use-cuda \
   --docs \
   --backend $backend \
+  --insecure \
   $ckpt \
   $vae \
   $CLI_ARGS \
