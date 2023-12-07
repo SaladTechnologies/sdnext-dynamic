@@ -39,6 +39,7 @@ Options:
   --vae-urls <url1,url2>          Comma-separated list of VAE download URLs. Default: ""
   --lora-urls <url1,url2>         Comma-separated list of LoRa download URLs. Default: ""
   --tag <tag>                     Tag to use for the image. Defaults to the CivitAI version IDs with a hyphen between them
+  --image <image>                 Image to build. Default: saladtechnologies/sdnext
   --help                          Show this message and exit
 ```
 
