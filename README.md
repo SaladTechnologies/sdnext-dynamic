@@ -25,8 +25,26 @@ The "baked" images use this one as a base
 
 ### With a model preloaded
 
+```
+Usage: ./build-baked [--options]
+
+Options:
+  --push                    Push the built image to dockerhub. Default: false
+  --civitai-version-ids     Comma separated list of civitai model version ids to load. Default: ""
+  --load-refiner            Load the refiner model. Default: false
+  --load-sdxl-base          Load the sdxl base model. Defaul: false
+  --controlnet-urls         Comma separated list of controlnet download urls. Default: ""
+  --extension-urls          Comma separated list of extension git urls. Default: ""
+  --ckpt-urls               Comma separated list of ckpt download urls. Default: ""
+  --vae-urls                Comma separated list of vae download urls. Default: ""
+  --lora-urls               Comma separated list of lora download urls. Default: ""
+  --tag                     Tag to use for the image. Defaults to the civitai version ids with a hyphen between them
+  --help                    Show this message and exit``
+```
+
+**Examples**
+
 ```shell
-# Usage: ./build [--push] [--civitai-version-ids 122143,128713] [--load-refiner] [--load-sdxl-base] [--tag tag]
 ./scripts/build-baked --civitai-version-ids 122143,128713
 ```
 
@@ -37,16 +55,19 @@ The "baked" images use this one as a base
 ```
 
 ## Environment Variables
-| Variable | Description | Default |
-| -------- | ----------- | ------- |
-| HOST | The host to listen on. Use `[::]` on Salad. You may need to use an ipv4 address like `0.0.0.0` for local development | `[::]` |
-| PORT | The port to listen on. This should match the port you configure for Salad networking. | 7860 |
-| CIVITAI_MODEL_VERSION_IDS | A comma-separated list of model version IDs to download. ex `128713` for just [Dreamshaper 8](https://civitai.com/models/4384?modelVersionId=128713) or `128713,166808` for Dreamshaper and [Arterior](https://civitai.com/models/112229/arterior-digital-art-style). This supports Checkpoints, VAEs, Controlnets, and LoRAs. The rightmost checkpoint value will be the default checkpoint when the server starts, and the rightmost vae value will be the default vae when the server starts. | None |
-| LOAD_SDXL_BASE | If set to `1`, the SDXL base model will be downloaded. | 0 |
-| LOAD_REFINER | If set to `1`, the SDXL refiner model will be downloaded. | 0 |
-| CONTROLNET_URLS | A comma-separated list of download urls for controlnets. ex `https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/diffusers_xl_canny_mid.safetensors?download=true` | None |
-| CLI_ARGS | Additional arguments to pass to the `sdnext` launch command. Options can be found with `--help` | None |
-| EXTENSIONS | A comma separated list of extensions to load, each in the format of `name\|repoUrl`. e.g. `deforum\|https://github.com/deforum-art/sd-webui-deforum`  | None |
+| Variable                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Default |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| HOST                      | The host to listen on. Use `[::]` on Salad. You may need to use an ipv4 address like `0.0.0.0` for local development                                                                                                                                                                                                                                                                                                                                                                             | `[::]`  |
+| PORT                      | The port to listen on. This should match the port you configure for Salad networking.                                                                                                                                                                                                                                                                                                                                                                                                            | 7860    |
+| CIVITAI_MODEL_VERSION_IDS | A comma-separated list of model version IDs to download. ex `128713` for just [Dreamshaper 8](https://civitai.com/models/4384?modelVersionId=128713) or `128713,166808` for Dreamshaper and [Arterior](https://civitai.com/models/112229/arterior-digital-art-style). This supports Checkpoints, VAEs, Controlnets, and LoRAs. The rightmost checkpoint value will be the default checkpoint when the server starts, and the rightmost vae value will be the default vae when the server starts. | None    |
+| LOAD_SDXL_BASE            | If set to `1`, the SDXL base model will be downloaded.                                                                                                                                                                                                                                                                                                                                                                                                                                           | 0       |
+| LOAD_REFINER              | If set to `1`, the SDXL refiner model will be downloaded.                                                                                                                                                                                                                                                                                                                                                                                                                                        | 0       |
+| CONTROLNET_URLS           | A comma-separated list of download urls for controlnets. ex `https://huggingface.co/lllyasviel/sd_control_collection/resolve/main/diffusers_xl_canny_mid.safetensors?download=true`                                                                                                                                                                                                                                                                                                              | None    |
+| CLI_ARGS                  | Additional arguments to pass to the `sdnext` launch command. Options can be found with `--help`                                                                                                                                                                                                                                                                                                                                                                                                  | None    |
+| EXTENSION_URLS            | A comma separated list of extension git urls to load. e.g. `https://github.com/deforum-art/sd-webui-deforum`                                                                                                                                                                                                                                                                                                                                                                                     | None    |
+| CKPT_URLS                 | A comma separated list of checkpoint download urls to load. e.g. `https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors?download=true`                                                                                                                                                                                                                                                                                                         | None    |
+| VAE_URLS                  | A comma separated list of vae download urls to load. e.g. `https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/diffusion_pytorch_model.safetensors?download=true`                                                                                                                                                                                                                                                                                                                  | None    |
+| LORA_URLS                 | A comma separated list of lora download urls to load. e.g. `https://huggingface.co/ostris/ikea-instructions-lora-sdxl/resolve/main/ikea_instructions_xl_v1_5.safetensors?download=true`                                                                                                                                                                                                                                                                                                          | None    |
 
 ## Built-in Exec Probes
 An exec probe is a command that is run periodically to check the health or readiness of the container. It returns a zero exit code if the container is healthy, and a non-zero exit code if the container is unhealthy. You can configure the maximum number of retries and the interval between retries using either the portal or the [Create Container Group API](https://docs.salad.com/reference/create_container_group). Learn more about health probes in [the docs](https://docs.salad.com/docs/health-probes).

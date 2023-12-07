@@ -1,8 +1,22 @@
 #! /usr/bin/env bash
-
-## Usage: ./build [--push] [--civitai-version-ids 122143,128713] [--load-refiner] [--load-sdxl-base] [--tag tag]
-
 set -euo pipefail
+usage='
+Usage: ./build-baked [--options]
+
+Options:
+  --push                    Push the built image to dockerhub. Default: false
+  --civitai-version-ids     Comma separated list of civitai model version ids to load. Default: ""
+  --load-refiner            Load the refiner model. Default: false
+  --load-sdxl-base          Load the sdxl base model. Defaul: false
+  --controlnet-urls         Comma separated list of controlnet download urls. Default: ""
+  --extension-urls          Comma separated list of extension git urls. Default: ""
+  --ckpt-urls               Comma separated list of ckpt download urls. Default: ""
+  --vae-urls                Comma separated list of vae download urls. Default: ""
+  --lora-urls               Comma separated list of lora download urls. Default: ""
+  --tag                     Tag to use for the image. Defaults to the civitai version ids with a hyphen between them
+  --help                    Show this message and exit
+'
+
 
 # parse args
 push=false
@@ -10,6 +24,11 @@ load_refiner=0
 load_sdxl_base=0
 civitai_model_version_ids=""
 tag=""
+controlnet_urls=""
+extension_urls=""
+ckpt_urls=""
+vae_urls=""
+lora_urls=""
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
@@ -30,10 +49,39 @@ while [[ $# -gt 0 ]]; do
     shift
     shift
     ;;
+  --controlnet-urls)
+    controlnet_urls="$2"
+    shift
+    shift
+    ;;
+  --extension-urls)
+    extension_urls="$2"
+    shift
+    shift
+    ;;
+  --ckpt-urls)
+    ckpt_urls="$2"
+    shift
+    shift
+    ;;
+  --vae-urls)
+    vae_urls="$2"
+    shift
+    shift
+    ;;
+  --lora-urls)
+    lora_urls="$2"
+    shift
+    shift
+    ;;
   --tag)
     tag="$2"
     shift
     shift
+    ;;
+  --help)
+    echo "$usage"
+    exit 0
     ;;
   *)
     echo "Unknown option $key"
@@ -60,6 +108,11 @@ docker buildx build \
   --build-arg CIVITAI_MODEL_VERSION_IDS=$civitai_model_version_ids \
   --build-arg LOAD_REFINER=$load_refiner \
   --build-arg LOAD_SDXL_BASE=$load_sdxl_base \
+  --build-arg CONTROLNET_URLS=$controlnet_urls \
+  --build-arg EXTENSION_URLS=$extension_urls \
+  --build-arg CKPT_URLS=$ckpt_urls \
+  --build-arg VAE_URLS=$vae_urls \
+  --build-arg LORA_URLS=$lora_urls \
   .
 
 docker tag saladtechnologies/sdnext:$tag saladtechnologies/sdnext:$tag-$git_sha
