@@ -45,8 +45,14 @@ Options:
 
 **Examples**
 
+Load 2 models from civitai
 ```shell
 ./scripts/build-baked --civitai-version-ids 122143,128713
+```
+
+Load SDXL Base and Refiner, and push the image to your own repository with a custom tag
+```shell
+./scripts/build-baked --load-sdxl-base --load-refiner --push --tag sdxl1.0 --image my-org/my-repo
 ```
 
 ### Original SDXL + Refiner
