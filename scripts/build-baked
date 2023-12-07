@@ -1,21 +1,21 @@
 #! /usr/bin/env bash
 set -euo pipefail
-usage='
-Usage: ./build-baked [--options]
+usage="
+Usage: ./build-baked [OPTIONS]
 
 Options:
-  --push                    Push the built image to dockerhub. Default: false
-  --civitai-version-ids     Comma separated list of civitai model version ids to load. Default: ""
-  --load-refiner            Load the refiner model. Default: false
-  --load-sdxl-base          Load the sdxl base model. Defaul: false
-  --controlnet-urls         Comma separated list of controlnet download urls. Default: ""
-  --extension-urls          Comma separated list of extension git urls. Default: ""
-  --ckpt-urls               Comma separated list of ckpt download urls. Default: ""
-  --vae-urls                Comma separated list of vae download urls. Default: ""
-  --lora-urls               Comma separated list of lora download urls. Default: ""
-  --tag                     Tag to use for the image. Defaults to the civitai version ids with a hyphen between them
-  --help                    Show this message and exit
-'
+  --push                          Push the built image to DockerHub. Default: false
+  --civitai-version-ids <v1,v2>   Comma-separated list of CivitAI model version IDs to load. Default: ""
+  --load-refiner                  Load the refiner model. Default: false
+  --load-sdxl-base                Load the SDXL base model. Default: false
+  --controlnet-urls <url1,url2>   Comma-separated list of ControlNet download URLs. Default: ""
+  --extension-urls <url1,url2>    Comma-separated list of extension Git URLs. Default: ""
+  --ckpt-urls <url1,url2>         Comma-separated list of CKPT download URLs. Default: ""
+  --vae-urls <url1,url2>          Comma-separated list of VAE download URLs. Default: ""
+  --lora-urls <url1,url2>         Comma-separated list of LoRa download URLs. Default: ""
+  --tag <tag>                     Tag to use for the image. Defaults to the CivitAI version IDs with a hyphen between them
+  --help                          Show this message and exit
+"
 
 
 # parse args
