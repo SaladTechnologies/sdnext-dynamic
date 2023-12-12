@@ -11,6 +11,7 @@ If you want an image with the model preloaded, you can use one of the "baked" im
 - `saladtechnologies/sdnext:sdxl1.0` - Preloaded with SDXL [Base](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) and [Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
 - `saladtechnologies/sdnext:dreamshaper8` - Preloaded with [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713)
 - `saladtechnologies/sdnext:rundiffusionxl-beta` - Preloaded with [RunDiffusion XL Beta](https://civitai.com/models/120964?modelVersionId=131579) and [SDXL Refiner](https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0)
+- `saladtechnologies/sdnext:dreamshaper8-qr-code` - Preloaded with [DreamShaper 8](https://civitai.com/models/4384?modelVersionId=128713) and [QR Code Monster](https://civitai.com/models/111006?modelVersionId=122143)
 
 ## Build your own image
 
