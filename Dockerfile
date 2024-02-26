@@ -4,7 +4,8 @@ RUN apt-get update && apt-get install -y \
   curl \
   jq
 
-RUN wget https://raw.githubusercontent.com/SaladTechnologies/stable-diffusion-configurator/main/configure && \
+RUN echo "Downloading stable-diffusion-configurator" && \
+  wget https://raw.githubusercontent.com/SaladTechnologies/stable-diffusion-configurator/main/configure && \
   chmod +x configure
 
 COPY entrypoint .
