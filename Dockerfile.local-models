@@ -1,0 +1,9 @@
+FROM saladtechnologies/sdnext:dynamic
+
+# Modify the left side with the actual path to your local checkpoint.
+# Do not modify the right side
+COPY ./path/to/model.safetensors $DATA_DIR/models/Stable-diffusion/
+
+# Make sure the filename matches what you've got above. Add --backend diffusers
+# to the CLI_ARGS if the model is based on SDXL, and you have not including the refiner in config.
+ENV CLI_ARGS "--ckpt $DATA_DIR/models/Stable-diffusion/model.safetensors"
