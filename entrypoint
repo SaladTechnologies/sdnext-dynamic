@@ -25,7 +25,7 @@ lora_model_path=$DATA_DIR/models/Lora/
 
 manifest=$(./configure --ckpt-path $sd_model_path --vae-path $vae_path --extension-path $extension_path --controlnet-model-path $controlnet_model_path --lora-path $lora_model_path)
 
-launch_args="--data-dir=$DATA_DIR --port $PORT --server-name $HOST --no-download --quick --use-cuda --docs"
+launch_args="--data-dir=$DATA_DIR --port $PORT --server-name $HOST --quick --use-cuda --docs"
 
 is_sdxl=$(echo $manifest | jq -r '.sdxl')
 

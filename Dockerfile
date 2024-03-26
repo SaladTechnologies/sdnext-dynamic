@@ -1,4 +1,4 @@
-FROM saladtechnologies/sdnext:latest
+FROM saladtechnologies/sdnext:base
 
 RUN apt-get update && apt-get install -y \
   curl \

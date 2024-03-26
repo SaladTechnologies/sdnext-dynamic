@@ -1,7 +1,7 @@
 version: '3'
 services:
   sdnext:
-    image: saladtechnologies/sdnext:dynamic
+    image: saladtechnologies/sdnext:dynamic-82973c4
     deploy:
       resources:
         reservations:
@@ -23,7 +23,7 @@ services:
       # CIVITAI_MODEL_VERSION_IDS: 130072
       ### Set to 1 to enable the refiner
       # LOAD_REFINER: 0
-      CKPT_URLS: https://civitai.com/api/download/models/114367?type=Model&format=SafeTensor&size=full&fp=fp16
+      # CKPT_URLS: https://civitai.com/api/download/models/114367?type=Model&format=SafeTensor&size=full&fp=fp16
 
       ### Set to 1 to enable base sdxl
       # LOAD_SDXL_BASE: 1
