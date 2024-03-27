@@ -61,6 +61,9 @@ chown -R $RUN_UID:$RUN_UID $DATA_DIR
 mkdir -p /tmp/gradio
 chown -R $RUN_UID:$RUN_UID /tmp/gradio
 
+# Remove --no-download flag if it exists from CLI_ARGS
+CLI_ARGS=$(echo $CLI_ARGS | sed 's/--no-download//g')
+
 exec runuser -u $(id -un $RUN_UID) -- \
   python "$INSTALLDIR"/launch.py \
   $launch_args \

@@ -1,7 +1,7 @@
 version: '3'
 services:
   sdnext:
-    image: saladtechnologies/sdnext:dynamic-82973c4
+    image: saladtechnologies/sdnext:dynamic
     deploy:
       resources:
         reservations:
