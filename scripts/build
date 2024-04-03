@@ -10,7 +10,10 @@ else
   push=false
 fi
 
-git_sha=$(git rev-parse --short HEAD)
+base_image="saladtechnologies/sdnext:base"
+git_sha=$(docker inspect ${base_image} | jq -r '.[].Config.Env[] | select(. | startswith("GIT_SHA")) | split("=")[1]')
+
+echo "Building saladtechnologies/sdnext:dynamic-$git_sha"
 
 docker buildx build \
   -t saladtechnologies/sdnext:dynamic \
